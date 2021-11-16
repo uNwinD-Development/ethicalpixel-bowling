@@ -8,7 +8,7 @@ local inBowlingZone = false
 local function canUseLane(pLaneId)
     local shit = false
 
-    XZCore.Functions.TriggerCallback('bp-bowling:getLaneAccess', function(response)
+    QBCore.Functions.TriggerCallback('bp-bowling:getLaneAccess', function(response)
         if(response == true) then
             shit = true
         end
@@ -19,8 +19,8 @@ local function canUseLane(pLaneId)
 end
 
 
-XZCore = nil
-TriggerEvent('XZCore:GetObject', function(obj) XZCore = obj end)
+QBCore = nil
+TriggerEvent('QBCore:GetObject', function(obj) QBCore = obj end)
 
 Citizen.CreateThread(function()
     for k, v in pairs(lanes) do
@@ -191,7 +191,7 @@ local lastlane = 0
 RegisterNetEvent('bp-bowling:bowlingPurchase')
 AddEventHandler("bp-bowling:bowlingPurchase", function(data)
     local isLane = type(data.key) == "number"
-    XZCore.Functions.TriggerCallback('bp-bowling:purchaseItem', function(response)
+    QBCore.Functions.TriggerCallback('bp-bowling:purchaseItem', function(response)
         if response == true then
             if(isLane == true) then
                 for k, v in pairs(lanes) do
@@ -203,9 +203,9 @@ AddEventHandler("bp-bowling:bowlingPurchase", function(data)
                 end
                 lanes[data.key].enabled = false
                 lastlane = data.key
-                XZCore.Functions.Notify("You've successfuly bought lane access | Lane: "..data.key.."#")
+                QBCore.Functions.Notify("You've successfuly bought lane access | Lane: "..data.key.."#")
             else
-                XZCore.Functions.Notify("You've successfuly bought a Bowling Ball")
+                QBCore.Functions.Notify("You've successfuly bought a Bowling Ball")
             end
             return
         end
@@ -241,7 +241,7 @@ local gameState = {}
 gameState[1] = {
     onState = function()
         if (totalDowned >= 10) then
-            XZCore.Functions.Notify("Strike!")
+            QBCore.Functions.Notify("Strike!")
 
             drawStatusHUD(true, {"Strike!"})
 
@@ -260,14 +260,14 @@ gameState[2] = {
     onState = function()
         if (totalDowned >= 10) then
             drawStatusHUD(true, {"Spare!"})
-            XZCore.Functions.Notify("Spare!")
+            QBCore.Functions.Notify("Spare!")
 
 
             Citizen.Wait(500)
 
             resetBowling()
         elseif (totalDowned < 10) then
-            XZCore.Functions.Notify("You downed " .. totalDowned .. " pins!")
+            QBCore.Functions.Notify("You downed " .. totalDowned .. " pins!")
 
             Citizen.Wait(1500)
 
