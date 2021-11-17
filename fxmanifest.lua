@@ -19,10 +19,3 @@ files {
   'ui/*'
 }
 
-dependencies {
-  'bt-polyzone',
-  'nh-context',
-  'bt-target',
-  ''
-}
-
