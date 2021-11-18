@@ -108,23 +108,23 @@ AddEventHandler('bp-bowling:client:openMenu' , function()
     local options = Config.BowlingVendor
     local data = {}
     local menuOptions = {}
-    for itemId, item in pairs(options) do
+    local uNwinDTestMenu = { }
 
-        TriggerEvent('nh-context:sendMenu', {
-            {
-                id = itemId,
-                header = item.name,
-                txt = "Price "..item.price.."$",
-                params = {
-                    event = "bp-bowling:openMenu2",
-                    args = {
-                        data = itemId,
-                    }
+
+    for itemId, item in pairs(options) do
+        uNwinDTestMenu[#uNwinDTestMenu+1] = {
+            id = itemId,
+            header = item.name,
+            txt = "Price "..item.price.."$",
+            params = {
+                event = "bp-bowling:openMenu2",
+                args = {
+                    data = itemId,
                 }
-            },
-        })
-        
+            }
+        }
     end
+    exports['qb-menu']:openMenu(uNwinDTestMenu)
 end)
 
 
@@ -136,20 +136,23 @@ AddEventHandler('bp-bowling:openMenu2' , function(data)
             if(lanes[k].enabled == false) then
                 return
             end
-            TriggerEvent('nh-context:sendMenu', {
-            {
-                id = k,
-                header = "Lane #"..k,
-                txt = "",
-                params = {
-                    event = "bp-bowling:bowlingPurchase",
-                    args = {
-                        key = k
+
+            local uNwinDTestMenu2 = { }
+
+            for k, v in ipairs(lanes) do
+                uNwinDTestMenu2[#uNwinDTestMenu2+1] = {
+                    id = k,
+                    header = "Lane #"..k,
+                    txt = "",
+                    params = {
+                        event = "bp-bowling:bowlingPurchase",
+                        args = {
+                            key = k
+                        }
                     }
                 }
-            },
-            })
-        
+            end
+            exports['qb-menu']:openMenu(uNwinDTestMenu2)
         end
 
     else

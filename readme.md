@@ -4,7 +4,7 @@
 
 
 # Dependencies
-[nh-context](https://github.com/nerohiro/nh-context)
+[qb-menu](https://github.com/qbcore-framework/qb-menu)
 
 [bt-polyzone](https://github.com/brentN5/bt-polyzone)
 
