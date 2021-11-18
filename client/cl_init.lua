@@ -228,12 +228,6 @@ AddEventHandler('bp-bowling:setupPins', function(pParameters)
     createPins(lanes[lane].pins)
 end)
 
-
-
-local function canUseBall()
-    return (lastBall == 0 or lastBall + 6000 < GetGameTimer()) and (inBowlingZone)
-end
-
 local function resetBowling()
     removePins()
     hasActivePins = false
@@ -286,8 +280,6 @@ RegisterNetEvent('bp-bowling:client:itemused')
 AddEventHandler('bp-bowling:client:itemused' , function()
     if (IsPedInAnyVehicle(PlayerPedId(), true)) then return end
 
-    -- Cooldown
-    if (canUseBall()) then return end
     startBowling(false, function(ballObject)
         lastBall = GetGameTimer()
         
