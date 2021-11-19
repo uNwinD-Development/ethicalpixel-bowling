@@ -68,9 +68,11 @@ Citizen.CreateThread(function()
 	FreezeEntityPosition(created_ped, true)
 	SetEntityInvincible(created_ped, true)
 	SetBlockingOfNonTemporaryEvents(created_ped, true)
+    local BowlingPed = {
+        GetHashKey("a_m_o_salton_01"),
+    }
 
-
-    exports['bt-target']:AddTargetModel(GetHashKey(data.model), {
+    exports['bt-target']:AddTargetModel(BowlingPed, {
         options = {
             {
                 event = 'bp-bowling:client:openMenu',
