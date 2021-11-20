@@ -64,6 +64,57 @@ Replace it with this
 
 
 
+Next go to bt-target/script.js/line: 27 you should be seeing smth like this
+
+		$("#target-"+index).data('TargetData', item.event);
+
+
+Right under it add this line 
+
+		$("#target-"+index).data('ParmsData', item.parms);
+
+
+Next in the same file look for this
+
+		$(document).on('mousedown', (event) => {
+			let element = event.target;
+
+			if (element.id.split("-")[0] === 'target') {
+				let TargetData = $("#"+element.id).data('TargetData');
+
+				$.post('http://bt-target/selectTarget', JSON.stringify({
+					event: TargetData,
+				}));
+
+				$(".target-label").html("");
+				$('.target-wrapper').hide();
+			}
+		});
+
+Adn replace with this
+
+		$(document).on('mousedown', (event) => {
+			let element = event.target;
+
+			if (element.id.split("-")[0] === 'target') {
+				let TargetData = $("#"+element.id).data('TargetData');
+
+				let ParmsData = $("#" + element.id).data('ParmsData');
+
+
+				$.post('http://bt-target/selectTarget', JSON.stringify({
+					event: TargetData,
+					parms: ParmsData,
+
+				}));
+
+				$(".target-label").html("");
+				$('.target-wrapper').hide();
+			}
+		});
+
+
+
 
 * 4 . Make sure the script is started after dependenicies
 
