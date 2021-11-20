@@ -80,6 +80,7 @@ Citizen.CreateThread(function()
                 label = 'View Store'
             }
         },
+        job = {"all"},
         distance = 1.5
     })
    
