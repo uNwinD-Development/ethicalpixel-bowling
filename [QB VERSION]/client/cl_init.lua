@@ -290,7 +290,7 @@ AddEventHandler('bp-bowling:client:itemused' , function()
     if (IsPedInAnyVehicle(PlayerPedId(), true)) then return end
 
     -- Cooldown
-    if (canUseBall()) then return end
+    if not (canUseBall()) then return end
     startBowling(false, function(ballObject)
         lastBall = GetGameTimer()
         
