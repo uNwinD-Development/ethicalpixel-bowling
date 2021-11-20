@@ -45,7 +45,27 @@
     
 * 2 . Drag the icons from the folder "Icons" to your inventory icons folder!
 
-* 3 . Make sure the script is started after dependenicies
+* 3 . This is a really iportnat step : bt-target/client.lua/line: 137
+
+You will find this 
+
+    	TriggerEvent(data.event)
+
+
+
+Replace it with this
+
+
+		if data.parms then
+			TriggerEvent(data.event, data.parms)
+		else
+			TriggerEvent(data.event)
+		end
+
+
+
+
+* 4 . Make sure the script is started after dependenicies
 
 
 # Known Bugs

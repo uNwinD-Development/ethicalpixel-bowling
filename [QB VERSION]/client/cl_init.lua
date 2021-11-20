@@ -180,9 +180,10 @@ function shit(k,v)
                         event = 'bp-bowling:setupPins',
                         icon = 'fas fa-arrow-circle-down',
                         label = 'Setup Pins',
-                        args = { v = k }
+                        parms = { v = k }
                     }
                 },
+                job = {"all"},
                 distance = 2.0
             })
             sheesh = false
@@ -222,7 +223,7 @@ AddEventHandler("bp-bowling:bowlingPurchase", function(data)
 end)
 
 AddEventHandler('bp-bowling:setupPins', function(pParameters)
-    local lane = pParameters.args.v
+    local lane = pParameters.v
     if (not lanes[lane]) then return end
     if (hasActivePins) then return end
     hasActivePins = true
