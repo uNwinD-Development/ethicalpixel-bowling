@@ -7,26 +7,23 @@ local lanes = Config.BowlingLanes
 local inBowlingZone = false
 local function canUseLane(pLaneId)
     local shit = false
-
-    QBCore.Functions.TriggerCallback('bp-bowling:getLaneAccess', function(response)
-        if(response == true) then
-            shit = true
-        end
-    end , pLaneId)
+    local response = RPC.execute("bp-bowling:getLaneAccess",pLaneId)
+    if(response == true) then
+        shit = true
+    end
     Citizen.Wait(300)
     return shit
 
 end
 
 
-QBCore = nil
-TriggerEvent('QBCore:GetObject', function(obj) QBCore = obj end)
+
 
 Citizen.CreateThread(function()
     for k, v in pairs(lanes) do
         if (not v.enabled) then goto continueBox end
 
-        exports["bt-polyzone"]:AddBoxZone("bp-bowling:lane_"..k, v.pos, 1.8, 2.0, {
+        exports[Config.PolyZoneScriptName]:AddBoxZone("bp-bowling:lane_"..k, v.pos, 1.8, 2.0, {
             heading=0,
             minZ=23.85,
             maxZ=27.85
@@ -35,7 +32,7 @@ Citizen.CreateThread(function()
         ::continueBox::
     end
   
-    exports["bt-polyzone"]:AddBoxZone("bowling_alley", vector3(743.95, -774.54, 26.34), 16.8, 30.4, {
+    exports[Config.PolyZoneScriptName]:AddBoxZone("bowling_alley", vector3(743.95, -774.54, 26.34), 16.8, 30.4, {
         heading=0.0,
         minZ=23.85,
         maxZ=28.85
@@ -62,17 +59,19 @@ Citizen.CreateThread(function()
     }
     RequestModel(GetHashKey(data.model))
 	while not HasModelLoaded(GetHashKey(data.model)) do
-		Citizen.Wait(1)
+		Citizen.Wait( 1 )
 	end
     created_ped = CreatePed(data.pedType, data.model , data.position.coords.x,data.position.coords.y,data. position.coords.z, data.position.heading, data.networked, false)
 	FreezeEntityPosition(created_ped, true)
 	SetEntityInvincible(created_ped, true)
 	SetBlockingOfNonTemporaryEvents(created_ped, true)
+
+
     local BowlingPed = {
         GetHashKey("a_m_o_salton_01"),
     }
 
-    exports['bt-target']:AddTargetModel(BowlingPed, {
+    exports[Config.TargetScriptName]:AddTargetModel(BowlingPed, {
         options = {
             {
                 event = 'bp-bowling:client:openMenu',
@@ -83,7 +82,12 @@ Citizen.CreateThread(function()
         job = {"all"},
         distance = 1.5
     })
-    ::continuePeak::
+   
+
+        ::continuePeak::
+    
+
+
 end)
 
 local function drawStatusHUD(state, pValues)
@@ -105,24 +109,22 @@ RegisterNetEvent('bp-bowling:client:openMenu')
 AddEventHandler('bp-bowling:client:openMenu' , function()
     local options = Config.BowlingVendor
     local data = {}
-    local menuOptions = {}
-    local uNwinDTestMenu = { }
-
-
     for itemId, item in pairs(options) do
-        uNwinDTestMenu[#uNwinDTestMenu+1] = {
-            id = itemId,
-            header = item.name,
-            txt = "Price "..item.price.."$",
-            params = {
-                event = "bp-bowling:openMenu2",
-                args = {
-                    data = itemId,
+
+        TriggerEvent('unwind-context:sendMenu', {
+            {
+                id = itemId,
+                header = item.name,
+                txt = "Price "..item.price.."$",
+                params = {
+                    event = "bp-bowling:openMenu2",
+                    args = {
+                        data = itemId,
+                    }
                 }
-            }
-        }
+            },
+        })
     end
-    exports['qb-menu']:openMenu(uNwinDTestMenu)
 end)
 
 
@@ -135,10 +137,8 @@ AddEventHandler('bp-bowling:openMenu2' , function(data)
                 return
             end
 
-            local uNwinDTestMenu2 = { }
-
-            for k, v in ipairs(lanes) do
-                uNwinDTestMenu2[#uNwinDTestMenu2+1] = {
+            TriggerEvent('unwind-context:sendMenu', {
+                {
                     id = k,
                     header = "Lane #"..k,
                     txt = "",
@@ -148,9 +148,8 @@ AddEventHandler('bp-bowling:openMenu2' , function(data)
                             key = k
                         }
                     }
-                }
-            end
-            exports['qb-menu']:openMenu(uNwinDTestMenu2)
+                },
+            })
         end
 
     else
@@ -162,27 +161,26 @@ local sheesh = false
 function shit(k,v) 
     Citizen.CreateThread(function()
         while sheesh == true do
-            sheesh = false
-            Citizen.Wait(0)
-
-            exports['bt-target']:AddBoxZone("bp-bowling:lane_"..k, v.pos, 1.8, 2.0, {
+            exports[Config.TargetScriptName]:AddBoxZone("bp-bowling:lane_"..k, v.pos, 1.8, 2.0, {
                 name = "bp-bowling:lane_"..k,
                 heading = 0.0,
                 minZ=20.85,
                 maxZ=28.85,
-                debugPoly = false
+                debugPoly = true
             }, {
                 options = {
-                    {
+                    {      
                         event = 'bp-bowling:setupPins',
                         icon = 'fas fa-arrow-circle-down',
                         label = 'Setup Pins',
                         parms = { v = k }
-                    }
+                    },
                 },
                 job = {"all"},
                 distance = 1.5
             })
+            sheesh = false
+            Citizen.Wait(0)
         end
     end)
 
@@ -193,38 +191,40 @@ local lastlane = 0
 RegisterNetEvent('bp-bowling:bowlingPurchase')
 AddEventHandler("bp-bowling:bowlingPurchase", function(data)
     local isLane = type(data.key) == "number"
-    QBCore.Functions.TriggerCallback('bp-bowling:purchaseItem', function(response)
-        if response == true then
-            if(isLane == true) then
-                for k, v in pairs(lanes) do
-                    if(canUseLane(k) == true) then
-                        sheesh = true
-                        shit(k , v)
-                    end
-                end
-                lanes[data.key].enabled = false
-                lastlane = data.key
-                QBCore.Functions.Notify("You've successfuly bought lane access | Lane: "..data.key.."#")
-            else
-                QBCore.Functions.Notify("You've successfuly bought a Bowling Ball")
-            end
-            return
-        end
-    
-    end , data.key , isLane)
+    local response = RPC.execute("bp-bowling:purchaseItem",data.key , isLane)
 
-   
+    if response == true then
+        if(isLane == true) then
+            for k, v in pairs(lanes) do
+
+                if(canUseLane(k) == true) then
+                    sheesh = true
+                    shit(k , v)
+                end
+            end
+            lanes[data.key].enabled = false
+            lastlane = data.key
+            TriggerEvent("DoLongHudText","You've successfuly bought lane access | Lane: "..data.key.."#")
+        else
+            TriggerEvent("DoLongHudText","You've successfuly bought a Bowling Ball")
+        end
+        return
+    end  
 end)
 
 AddEventHandler('bp-bowling:setupPins', function(pParameters)
-    print(pParameters)
-    local lane = pParameters.v
-    if (not lanes[lane]) then return end
-    if (hasActivePins) then return end
-    hasActivePins = true
-    currentLane = lane
-    drawStatusHUD(true)
-    createPins(lanes[lane].pins)
+    local response = RPC.execute("bp-bowling:getLaneAccess",pParameters.v)
+    if response == true then
+        local lane = pParameters.v
+        if (not lanes[lane]) then return end
+        if (hasActivePins) then return end
+        hasActivePins = true
+        currentLane = lane
+        drawStatusHUD(true)
+        createPins(lanes[lane].pins)
+    else
+        TriggerEvent("DoLongHudText","No access to this lane",2)
+    end
 end)
 
 
@@ -243,7 +243,7 @@ local gameState = {}
 gameState[1] = {
     onState = function()
         if (totalDowned >= 10) then
-            QBCore.Functions.Notify("Strike!")
+            TriggerEvent("DoLongHudText","Strike!")
 
             drawStatusHUD(true, {"Strike!"})
 
@@ -262,14 +262,14 @@ gameState[2] = {
     onState = function()
         if (totalDowned >= 10) then
             drawStatusHUD(true, {"Spare!"})
-            QBCore.Functions.Notify("Spare!")
+            TriggerEvent("DoLongHudText","Spare!")
 
 
             Citizen.Wait(500)
 
             resetBowling()
         elseif (totalDowned < 10) then
-            QBCore.Functions.Notify("You downed " .. totalDowned .. " pins!")
+            TriggerEvent("You downed " .. totalDowned .. " pins!")
 
             Citizen.Wait(1500)
 
@@ -286,7 +286,7 @@ AddEventHandler('bp-bowling:client:itemused' , function()
     if (IsPedInAnyVehicle(PlayerPedId(), true)) then return end
 
     -- Cooldown
-    if not (canUseBall()) then return end
+    if (not canUseBall()) then return end
     startBowling(false, function(ballObject)
         lastBall = GetGameTimer()
         
@@ -338,23 +338,40 @@ AddEventHandler('onResourceStop', function(resourceName)
     drawStatusHUD(false)
 end)
 
-AddEventHandler("bt-polyzone:enter", function(zone, data)
+AddEventHandler("unwind-polyzone:enter", function(zone, data)
     if zone ~= "bowling_alley" then return end
     inBowlingZone = true
 end)
 
-AddEventHandler("bt-polyzone:exit", function(zone, data)
+AddEventHandler("unwind-polyzone:exit", function(zone, data)
     if zone ~= "bowling_alley" then return end
 
     inBowlingZone = false
-    TriggerServerEvent("bp-bowling:RemoveItem")
-    if lanes[lastlane] ~= nil then
+    TriggerEvent("bp-bowling:RemoveItem")
+    if (lanes[lastlane] ~= nil) then
         lanes[lastlane].enabled = true
     end
-
     if (hasActivePins) then
         resetBowling()
         totalDowned = 0
         totalThrown = 0
     end
 end)
+
+
+RegisterNetEvent("bp-bowling:RemoveItem")
+AddEventHandler("bp-bowling:RemoveItem" , function()
+    if not exports["unwind-inventory"]:hasEnoughOfItem("bowlingball",1,false) then return end
+    if exports['unwind-inventory']:hasEnoughOfItem('bowlingball', 1) then
+        TriggerEvent("inventory:removeItem", "bowlingball", 1)
+        Citizen.Wait(3000)
+    end
+    if not exports["unwind-inventory"]:hasEnoughOfItem("bowlingreceipt",1,false) then return end
+    if exports['unwind-inventory']:hasEnoughOfItem('bowlingreceipt', 1) then
+        TriggerEvent("inventory:removeItem", "bowlingreceipt", 1)
+        Citizen.Wait(3000)
+    end
+end)
+
+
+
