@@ -91,7 +91,7 @@ Next in the same file look for this
 			}
 		});
 
-Adn replace with this
+And replace with this
 
 		$(document).on('mousedown', (event) => {
 			let element = event.target;
