@@ -123,7 +123,7 @@ Adn replace with this
 No known bugs
 
 # Support
-Feel free to report any issues you have in our [Discord](discord.gg/a7XeGhpdpb)
+Feel free to report any issues you have in our [Discord](discord.gg/W5MtEHy5ga)
 
 ```
 </BroPixel > Development Team
