@@ -1,4 +1,4 @@
-# This is the NP BASE Vesion of BroPixel-Bowling
+# This is the NP BASE Vesion of EthicalPixelBowling
 
 # [Preview](https://www.youtube.com/watch?v=DFcgbX3oZUY)
 
